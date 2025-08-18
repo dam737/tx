@@ -5,30 +5,11 @@
   <title>Tài Xỉu Vui</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      background: linear-gradient(to bottom, #1a0f0f, #000);
-      font-family: "Poppins", sans-serif;
-    }
-    .card {
-      background: #2b1a1a;
-      border-radius: 20px;
-      box-shadow: 0px 4px 20px rgba(0,0,0,0.6);
-    }
-    .btn {
-      background: linear-gradient(to right, #facc15, #f59e0b);
-      border-radius: 12px;
-      font-weight: bold;
-      padding: 10px 20px;
-      transition: 0.2s;
-    }
-    .btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #facc15aa;
-    }
-    .chosen {
-      border: 3px solid #facc15;
-      box-shadow: 0 0 20px #facc15aa;
-    }
+    body { background: linear-gradient(to bottom, #1a0f0f, #000); font-family: "Poppins", sans-serif; }
+    .card { background: #2b1a1a; border-radius: 20px; box-shadow: 0px 4px 20px rgba(0,0,0,0.6); }
+    .btn { background: linear-gradient(to right, #facc15, #f59e0b); border-radius: 12px; font-weight: bold; padding: 10px 20px; transition: 0.2s; }
+    .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #facc15aa; }
+    .chosen { border: 3px solid #facc15; box-shadow: 0 0 20px #facc15aa; }
   </style>
 </head>
 <body class="text-white flex justify-center items-center min-h-screen">
@@ -37,17 +18,15 @@
   <div id="loginScreen" class="card p-8 text-center w-[400px]">
     <h1 class="text-3xl font-bold text-yellow-400 mb-4">🎲 TÀI XỈU VUI 🎲</h1>
     <p class="mb-2">Tên tài khoản:</p>
-    <input id="usernameInput" type="text" placeholder="Tên đăng nhập..."
-           class="w-full p-2 rounded text-black mb-3">
+    <input id="usernameInput" type="text" placeholder="Tên đăng nhập..." class="w-full p-2 rounded text-black mb-3">
     <p class="mb-2">Mật khẩu:</p>
-    <input id="passwordInput" type="password" placeholder="Mật khẩu..."
-           class="w-full p-2 rounded text-black mb-4">
+    <input id="passwordInput" type="password" placeholder="Mật khẩu..." class="w-full p-2 rounded text-black mb-4">
     <button class="btn w-full mb-2" onclick="login()">ĐĂNG NHẬP</button>
     <button class="btn w-full bg-green-500" onclick="register()">ĐĂNG KÝ</button>
   </div>
 
   <!-- Màn hình game -->
-  <div id="gameScreen" class="hidden w-[1100px] p-6 card text-center">
+  <div id="gameScreen" class="hidden w-[1200px] p-6 card text-center">
     <h1 class="text-3xl font-bold mb-6 text-yellow-400">🎲 TÀI XỈU 🎲</h1>
     <p class="mb-6 text-lg">👤 Người chơi: <span id="playerName" class="text-green-400 font-bold"></span></p>
 
@@ -92,17 +71,19 @@
       </div>
     </div>
 
-    <!-- Chat Box -->
+    <!-- Chat, Trạng thái, Bảng xếp hạng -->
     <div class="mt-8 grid grid-cols-3 gap-4">
-      <div class="col-span-2 card p-4 text-left">
+      <!-- Chat -->
+      <div class="col-span-1 card p-4 text-left">
         <h3 class="font-bold text-yellow-300 mb-2">💬 Chat Box</h3>
         <div id="chatBox" class="h-40 overflow-y-auto bg-black/40 p-2 rounded"></div>
         <div class="flex mt-2">
-          <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." 
-            class="flex-1 p-2 rounded text-black">
+          <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." class="flex-1 p-2 rounded text-black" onkeydown="if(event.key==='Enter') sendChat()">
           <button class="btn ml-2" onclick="sendChat()">Gửi</button>
         </div>
       </div>
+
+      <!-- Trạng thái -->
       <div class="card p-4">
         <h3 class="font-bold text-yellow-300">📊 Trạng thái</h3>
         <p class="mt-2">Điểm của bạn: <span id="myPoints" class="font-bold text-green-400">0</span></p>
@@ -110,33 +91,38 @@
         <p class="mt-1">Cửa: <span id="betSide" class="text-red-400">Chưa chọn</span></p>
         <p class="mt-1">Kết quả: <span id="result" class="text-yellow-400 font-bold">Đang chờ...</span></p>
       </div>
+
+      <!-- Bảng xếp hạng -->
+      <div class="card p-4">
+        <h3 class="font-bold text-yellow-300 mb-2">🏆 Top 100</h3>
+        <div class="h-40 overflow-y-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="text-yellow-400">
+                <th class="px-2">#</th>
+                <th class="px-2">Tên</th>
+                <th class="px-2">Điểm</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    let timer = 20;
-    let countdown;
-    let myPoints = 0;
-    let betTemp = 0;
-    let betTempSaved = 0;
-    let betSide = null;
-    let hasChosenSide = false;
-    let taiScore = 0, xiuScore = 0;
-    let taiPlayers = 0, xiuPlayers = 0;
+    let timer = 20, countdown;
+    let myPoints = 0, betTemp = 0, betTempSaved = 0, betSide = null, hasChosenSide = false;
+    let taiScore = 0, xiuScore = 0, taiPlayers = 0, xiuPlayers = 0;
     let playerName = "";
 
     // ================= AUTH ==================
     function register() {
       let user = document.getElementById("usernameInput").value.trim();
       let pass = document.getElementById("passwordInput").value.trim();
-      if (!user || !pass) {
-        alert("Nhập đầy đủ thông tin!");
-        return;
-      }
-      if (localStorage.getItem("user_" + user)) {
-        alert("Tên đã tồn tại!");
-        return;
-      }
+      if (!user || !pass) { alert("Nhập đầy đủ thông tin!"); return; }
+      if (localStorage.getItem("user_" + user)) { alert("Tên đã tồn tại!"); return; }
       let data = {username: user, password: pass, points: 1000000};
       localStorage.setItem("user_" + user, JSON.stringify(data));
       alert("Đăng ký thành công! Bạn có 1,000,000 điểm.");
@@ -146,27 +132,23 @@
       let user = document.getElementById("usernameInput").value.trim();
       let pass = document.getElementById("passwordInput").value.trim();
       let data = localStorage.getItem("user_" + user);
-      if (!data) {
-        alert("Không tìm thấy tài khoản!");
-        return;
-      }
+      if (!data) { alert("Không tìm thấy tài khoản!"); return; }
       let obj = JSON.parse(data);
-      if (obj.password !== pass) {
-        alert("Sai mật khẩu!");
-        return;
-      }
+      if (obj.password !== pass) { alert("Sai mật khẩu!"); return; }
       playerName = obj.username;
       myPoints = obj.points;
       document.getElementById("playerName").textContent = playerName;
       document.getElementById("myPoints").textContent = myPoints.toLocaleString();
-
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("gameScreen").classList.remove("hidden");
+      updateLeaderboard();
+      loadChatHistory();
       startTimer();
     }
 
     function saveData() {
-      let data = {username: playerName, password: JSON.parse(localStorage.getItem("user_" + playerName)).password, points: myPoints};
+      let old = JSON.parse(localStorage.getItem("user_" + playerName));
+      let data = {username: playerName, password: old.password, points: myPoints};
       localStorage.setItem("user_" + playerName, JSON.stringify(data));
     }
 
@@ -177,111 +159,100 @@
       countdown = setInterval(() => {
         timer--;
         document.getElementById("timer").textContent = timer;
-        if (timer <= 0) {
-          clearInterval(countdown);
-          rollDice();
-        }
+        if (timer <= 0) { clearInterval(countdown); rollDice(); }
       }, 1000);
     }
 
-    function addPoint(val) {
-      betTemp += val;
-      document.getElementById("betTemp").textContent = betTemp.toLocaleString();
-    }
-
-    function allIn() {
-      betTemp = myPoints;
-      document.getElementById("betTemp").textContent = betTemp.toLocaleString();
-    }
-
+    function addPoint(val) { betTemp += val; document.getElementById("betTemp").textContent = betTemp.toLocaleString(); }
+    function allIn() { betTemp = myPoints; document.getElementById("betTemp").textContent = betTemp.toLocaleString(); }
     function chooseSide(side) {
       if (hasChosenSide) return;
-      betSide = side;
-      hasChosenSide = true;
+      betSide = side; hasChosenSide = true;
       document.getElementById("betSide").textContent = side.toUpperCase();
-      if (side === "tai") {
-        document.getElementById("taiCard").classList.add("chosen");
-        document.getElementById("btnXiu").disabled = true;
-      } else {
-        document.getElementById("xiuCard").classList.add("chosen");
-        document.getElementById("btnTai").disabled = true;
-      }
+      if (side === "tai") { document.getElementById("taiCard").classList.add("chosen"); document.getElementById("btnXiu").disabled = true; }
+      else { document.getElementById("xiuCard").classList.add("chosen"); document.getElementById("btnTai").disabled = true; }
     }
 
     function confirmBet() {
-      if (!betSide || betTemp === 0) {
-        alert("Bạn chưa chọn cửa hoặc chưa nhập điểm!");
-        return;
-      }
-      if (betTemp > myPoints) {
-        alert("Bạn không đủ điểm!");
-        return;
-      }
-      myPoints -= betTemp;
-      betTempSaved = betTemp;
+      if (!betSide || betTemp === 0) { alert("Bạn chưa chọn cửa hoặc chưa nhập điểm!"); return; }
+      if (betTemp > myPoints) { alert("Bạn không đủ điểm!"); return; }
+      myPoints -= betTemp; betTempSaved = betTemp;
       document.getElementById("myPoints").textContent = myPoints.toLocaleString();
-      if (betSide === "tai") {
-        taiScore += betTemp;
-        taiPlayers++;
-        document.getElementById("taiScore").textContent = taiScore.toLocaleString();
-        document.getElementById("taiPlayers").textContent = taiPlayers;
-      } else {
-        xiuScore += betTemp;
-        xiuPlayers++;
-        document.getElementById("xiuScore").textContent = xiuScore.toLocaleString();
-        document.getElementById("xiuPlayers").textContent = xiuPlayers;
-      }
-      betTemp = 0;
-      document.getElementById("betTemp").textContent = 0;
+      if (betSide === "tai") { taiScore += betTemp; taiPlayers++; document.getElementById("taiScore").textContent = taiScore.toLocaleString(); document.getElementById("taiPlayers").textContent = taiPlayers; }
+      else { xiuScore += betTemp; xiuPlayers++; document.getElementById("xiuScore").textContent = xiuScore.toLocaleString(); document.getElementById("xiuPlayers").textContent = xiuPlayers; }
+      betTemp = 0; document.getElementById("betTemp").textContent = 0;
     }
-
-    function cancelBet() {
-      betTemp = 0;
-      betTempSaved = 0;
-      document.getElementById("betTemp").textContent = 0;
-    }
+    function cancelBet() { betTemp = 0; betTempSaved = 0; document.getElementById("betTemp").textContent = 0; }
 
     function resetRound() {
       betTemp = 0; betTempSaved = 0; betSide = null; hasChosenSide = false;
-      document.getElementById("betTemp").textContent = 0;
-      document.getElementById("betSide").textContent = "Chưa chọn";
-      document.getElementById("taiCard").classList.remove("chosen");
-      document.getElementById("xiuCard").classList.remove("chosen");
-      document.getElementById("btnTai").disabled = false;
-      document.getElementById("btnXiu").disabled = false;
+      document.getElementById("betTemp").textContent = 0; document.getElementById("betSide").textContent = "Chưa chọn";
+      document.getElementById("taiCard").classList.remove("chosen"); document.getElementById("xiuCard").classList.remove("chosen");
+      document.getElementById("btnTai").disabled = false; document.getElementById("btnXiu").disabled = false;
     }
 
     function rollDice() {
-      let dice1 = Math.floor(Math.random() * 6) + 1;
-      let dice2 = Math.floor(Math.random() * 6) + 1;
-      let dice3 = Math.floor(Math.random() * 6) + 1;
-      let total = dice1 + dice2 + dice3;
-      let result = total >= 11 ? "tai" : "xiu";
-      document.getElementById("result").textContent =
-        `🎲 ${dice1} + ${dice2} + ${dice3} = ${total} ➝ ${result.toUpperCase()}`;
-      if (betSide === result) {
-        myPoints += betTempSaved * 2;
+      let d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1, d3 = Math.floor(Math.random()*6)+1;
+      let total = d1+d2+d3, result = total >= 11 ? "tai" : "xiu";
+      document.getElementById("result").textContent = `🎲 ${d1} + ${d2} + ${d3} = ${total} ➝ ${result.toUpperCase()}`;
+      
+      if (betSide) {
+        if (betSide === result) { myPoints += betTempSaved*2; }
+        else {
+          if (taiScore === xiuScore) { myPoints += betTempSaved; } // trả nếu hòa
+        }
         document.getElementById("myPoints").textContent = myPoints.toLocaleString();
       }
-      saveData();
-      resetRound();
-      taiScore = 0; xiuScore = 0; taiPlayers = 0; xiuPlayers = 0;
-      document.getElementById("taiScore").textContent = 0;
-      document.getElementById("xiuScore").textContent = 0;
-      document.getElementById("taiPlayers").textContent = 0;
-      document.getElementById("xiuPlayers").textContent = 0;
+
+      saveData(); updateLeaderboard(); resetRound();
+      taiScore=0; xiuScore=0; taiPlayers=0; xiuPlayers=0;
+      document.getElementById("taiScore").textContent=0; document.getElementById("xiuScore").textContent=0;
+      document.getElementById("taiPlayers").textContent=0; document.getElementById("xiuPlayers").textContent=0;
       startTimer();
     }
 
+    // ================= LEADERBOARD ==================
+    function updateLeaderboard() {
+      let players = [];
+      for (let i=0;i<localStorage.length;i++) {
+        let key = localStorage.key(i);
+        if (key.startsWith("user_")) {
+          let obj = JSON.parse(localStorage.getItem(key));
+          players.push({name: obj.username, score: obj.points});
+        }
+      }
+      players.sort((a,b)=>b.score-a.score);
+      let top = players.slice(0,100);
+      let html="";
+      top.forEach((p,idx)=>{
+        html += `<tr class="${p.name===playerName?'bg-yellow-700/40 font-bold':''}">
+          <td class="px-2">${idx+1}</td><td class="px-2">${p.name}</td><td class="px-2">${p.score.toLocaleString()}</td></tr>`;
+      });
+      document.getElementById("leaderboard").innerHTML = html;
+    }
+
+    // ================= CHAT ==================
+    function loadChatHistory() {
+      let chatBox=document.getElementById("chatBox");
+      chatBox.innerHTML="";
+      let history=JSON.parse(localStorage.getItem("chat_history")||"[]");
+      history.forEach(msg=>{
+        let p=document.createElement("p");
+        p.innerHTML=`<span class="text-green-400">${msg.user}:</span> ${msg.text}`;
+        chatBox.appendChild(p);
+      });
+      chatBox.scrollTop=chatBox.scrollHeight;
+    }
+
     function sendChat() {
-      let msg = document.getElementById("chatInput").value;
+      let msg=document.getElementById("chatInput").value.trim();
       if (!msg) return;
-      let chatBox = document.getElementById("chatBox");
-      let p = document.createElement("p");
-      p.innerHTML = `<span class="text-green-400">${playerName}:</span> ${msg}`;
-      chatBox.appendChild(p);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      document.getElementById("chatInput").value = "";
+      let history=JSON.parse(localStorage.getItem("chat_history")||"[]");
+      history.push({user:playerName,text:msg});
+      if (history.length>200) history.shift(); // chỉ giữ 200 tin
+      localStorage.setItem("chat_history",JSON.stringify(history));
+      loadChatHistory();
+      document.getElementById("chatInput").value="";
     }
   </script>
 </body>
