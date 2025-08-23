@@ -2,258 +2,1002 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Tài Xỉu Vui</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Xỉu Vui - Phiên bản nâng cấp</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background: linear-gradient(to bottom, #1a0f0f, #000); font-family: "Poppins", sans-serif; }
-    .card { background: #2b1a1a; border-radius: 20px; box-shadow: 0px 4px 20px rgba(0,0,0,0.6); }
-    .btn { background: linear-gradient(to right, #facc15, #f59e0b); border-radius: 12px; font-weight: bold; padding: 10px 20px; transition: 0.2s; }
-    .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px #facc15aa; }
-    .chosen { border: 3px solid #facc15; box-shadow: 0 0 20px #facc15aa; }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    
+    body { 
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+      font-family: "Poppins", sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .card { 
+      background: rgba(30, 30, 45, 0.8); 
+      backdrop-filter: blur(10px);
+      border-radius: 20px; 
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn { 
+      background: linear-gradient(to right, #f59e0b, #facc15); 
+      border-radius: 12px; 
+      font-weight: bold; 
+      padding: 10px 20px; 
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+    
+    .btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+    }
+    
+    .chosen { 
+      border: 3px solid #facc15; 
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    
+    .dice {
+      width: 60px;
+      height: 60px;
+      background: white;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      margin: 0 5px;
+      animation: roll 0.5s ease-in-out;
+    }
+    
+    @keyframes roll {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    .chat-message {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .leaderboard-row {
+      transition: all 0.3s ease;
+    }
+    
+    .leaderboard-row:hover {
+      background: rgba(245, 158, 11, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .top-player {
+      background: linear-gradient(to right, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+      border-left: 3px solid #facc15;
+    }
+    
+    .timer-warning {
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    
+    .history-item {
+      border-left: 3px solid #3b82f6;
+      padding-left: 10px;
+      margin-bottom: 8px;
+    }
+    
+    .win {
+      border-left-color: #10b981;
+      color: #10b981;
+    }
+    
+    .lose {
+      border-left-color: #ef4444;
+      color: #ef4444;
+    }
+    
+    .draw {
+      border-left-color: #f59e0b;
+      color: #f59e0b;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .game-container {
+        flex-direction: column;
+      }
+      
+      .game-stats {
+        width: 100% !important;
+        margin-top: 20px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .btn {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      .dice {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+      }
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .notification.success {
+      background-color: #10b981;
+    }
+    
+    .notification.error {
+      background-color: #ef4444;
+    }
+    
+    .notification.warning {
+      background-color: #f59e0b;
+    }
+    
+    .notification.info {
+      background-color: #3b82f6;
+    }
   </style>
 </head>
-<body class="text-white flex justify-center items-center min-h-screen">
-
-  <!-- Màn hình đăng nhập -->
-  <div id="loginScreen" class="card p-8 text-center w-[400px]">
-    <h1 class="text-3xl font-bold text-yellow-400 mb-4">🎲 TÀI XỈU VUI 🎲</h1>
-    <p class="mb-2">Tên tài khoản:</p>
-    <input id="usernameInput" type="text" placeholder="Tên đăng nhập..." class="w-full p-2 rounded text-black mb-3">
-    <p class="mb-2">Mật khẩu:</p>
-    <input id="passwordInput" type="password" placeholder="Mật khẩu..." class="w-full p-2 rounded text-black mb-4">
-    <button class="btn w-full mb-2" onclick="login()">ĐĂNG NHẬP</button>
-    <button class="btn w-full bg-green-500" onclick="register()">ĐĂNG KÝ</button>
-  </div>
-
-  <!-- Màn hình game -->
-  <div id="gameScreen" class="hidden w-[1200px] p-6 card text-center">
-    <h1 class="text-3xl font-bold mb-6 text-yellow-400">🎲 TÀI XỈU 🎲</h1>
-    <p class="mb-6 text-lg">👤 Người chơi: <span id="playerName" class="text-green-400 font-bold"></span></p>
-
-    <!-- Khu đặt cược -->
-    <div class="grid grid-cols-3 gap-6 items-center">
-      <!-- TÀI -->
-      <div id="taiCard" class="card p-6">
-        <h2 class="text-2xl font-bold">TÀI</h2>
-        <p class="text-yellow-300 text-lg">Người chơi: <span id="taiPlayers">0</span></p>
-        <p class="mt-1 text-yellow-400 text-lg">Điểm: <span id="taiScore">0</span></p>
-        <button id="btnTai" class="btn mt-4" onclick="chooseSide('tai')">CHỌN TÀI</button>
+<body class="text-white min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="py-4 px-6 flex justify-between items-center">
+    <div class="flex items-center space-x-3">
+      <i class="fas fa-dice text-yellow-400 text-3xl"></i>
+      <h1 class="text-2xl font-bold text-yellow-400">TÀI XỈU VUI</h1>
+    </div>
+    <div id="userInfo" class="hidden items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-user-circle text-yellow-400 text-xl"></i>
+        <span id="playerNameHeader" class="font-medium"></span>
       </div>
-
-      <!-- Đồng hồ + điểm -->
-      <div class="flex flex-col items-center">
-        <div class="w-28 h-28 rounded-full border-8 border-yellow-400 flex items-center justify-center text-3xl font-bold">
-          <span id="timer">20</span>
-        </div>
-        <div class="flex space-x-2 mt-4">
-          <button class="btn" onclick="addPoint(1000)">1K</button>
-          <button class="btn" onclick="addPoint(10000)">10K</button>
-          <button class="btn" onclick="addPoint(50000)">50K</button>
-        </div>
-        <div class="flex space-x-2 mt-2">
-          <button class="btn" onclick="addPoint(100000)">100K</button>
-          <button class="btn" onclick="addPoint(5000000)">5M</button>
-          <button class="btn" onclick="addPoint(10000000)">10M</button>
-        </div>
-        <div class="flex space-x-2 mt-2">
-          <button class="btn bg-purple-600" onclick="allIn()">ALL-IN</button>
-          <button class="btn bg-green-600" onclick="confirmBet()">ĐẶT CƯỢC</button>
-          <button class="btn bg-red-600" onclick="cancelBet()">HỦY</button>
-        </div>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-coins text-yellow-400 text-xl"></i>
+        <span id="myPointsHeader" class="font-bold"></span>
       </div>
+    </div>
+  </header>
 
-      <!-- XỈU -->
-      <div id="xiuCard" class="card p-6">
-        <h2 class="text-2xl font-bold">XỈU</h2>
-        <p class="text-yellow-300 text-lg">Người chơi: <span id="xiuPlayers">0</span></p>
-        <p class="mt-1 text-yellow-400 text-lg">Điểm: <span id="xiuScore">0</span></p>
-        <button id="btnXiu" class="btn mt-4" onclick="chooseSide('xiu')">CHỌN XỈU</button>
+  <!-- Main Content -->
+  <main class="flex-1 flex justify-center items-center p-4">
+    <!-- Màn hình đăng nhập -->
+    <div id="loginScreen" class="card p-8 text-center w-[400px] max-w-full">
+      <div class="mb-6">
+        <i class="fas fa-dice text-yellow-400 text-5xl mb-4"></i>
+        <h1 class="text-3xl font-bold text-yellow-400">TÀI XỈU VUI</h1>
+        <p class="text-gray-300 mt-2">Đăng nhập để bắt đầu chơi</p>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <p class="mb-2 text-left">Tên tài khoản:</p>
+          <div class="relative">
+            <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+            <input id="usernameInput" type="text" placeholder="Tên đăng nhập..." 
+              class="w-full p-3 pl-10 rounded bg-gray-800 text-white border border-gray-700 focus:border-yellow-400 focus:outline-none">
+          </div>
+        </div>
+        
+        <div>
+          <p class="mb-2 text-left">Mật khẩu:</p>
+          <div class="relative">
+            <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+            <input id="passwordInput" type="password" placeholder="Mật khẩu..." 
+              class="w-full p-3 pl-10 rounded bg-gray-800 text-white border border-gray-700 focus:border-yellow-400 focus:outline-none">
+          </div>
+        </div>
+        
+        <button class="btn w-full py-3 text-lg" onclick="login()">
+          <i class="fas fa-sign-in-alt mr-2"></i> ĐĂNG NHẬP
+        </button>
+        
+        <button class="btn w-full py-3 bg-green-600 hover:bg-green-500" onclick="register()">
+          <i class="fas fa-user-plus mr-2"></i> ĐĂNG KÝ
+        </button>
       </div>
     </div>
 
-    <!-- Chat, Trạng thái, Bảng xếp hạng -->
-    <div class="mt-8 grid grid-cols-3 gap-4">
-      <!-- Chat -->
-      <div class="col-span-1 card p-4 text-left">
-        <h3 class="font-bold text-yellow-300 mb-2">💬 Chat Box</h3>
-        <div id="chatBox" class="h-40 overflow-y-auto bg-black/40 p-2 rounded"></div>
-        <div class="flex mt-2">
-          <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." class="flex-1 p-2 rounded text-black" onkeydown="if(event.key==='Enter') sendChat()">
-          <button class="btn ml-2" onclick="sendChat()">Gửi</button>
+    <!-- Màn hình game -->
+    <div id="gameScreen" class="hidden w-full max-w-6xl">
+      <div class="game-container flex flex-col lg:flex-row gap-6">
+        <!-- Game Area -->
+        <div class="flex-1">
+          <div class="card p-6 mb-6">
+            <div class="flex justify-between items-center mb-6">
+              <h1 class="text-2xl font-bold text-yellow-400">🎲 TÀI XỈU 🎲</h1>
+              <div class="flex items-center space-x-4">
+                <div class="text-center">
+                  <div class="w-16 h-16 rounded-full border-4 border-yellow-400 flex items-center justify-center text-xl font-bold" id="timerContainer">
+                    <span id="timer">20</span>
+                  </div>
+                  <p class="text-xs mt-1 text-gray-300">Thời gian</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dice Area -->
+            <div class="flex justify-center items-center mb-8">
+              <div id="diceContainer" class="flex justify-center">
+                <div class="dice" id="dice1">?</div>
+                <div class="dice" id="dice2">?</div>
+                <div class="dice" id="dice3">?</div>
+              </div>
+            </div>
+            
+            <!-- Betting Area -->
+            <div class="grid grid-cols-2 gap-6">
+              <!-- TÀI -->
+              <div id="taiCard" class="card p-6 text-center">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-3">TÀI</h2>
+                <div class="flex justify-between mb-3">
+                  <div>
+                    <p class="text-sm text-gray-300">Người chơi</p>
+                    <p class="text-lg font-bold"><span id="taiPlayers">0</span></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-300">Tổng điểm</p>
+                    <p class="text-lg font-bold"><span id="taiScore">0</span></p>
+                  </div>
+                </div>
+                <button id="btnTai" class="btn w-full py-2" onclick="chooseSide('tai')">
+                  <i class="fas fa-hand-point-up mr-2"></i> CHỌN TÀI
+                </button>
+              </div>
+              
+              <!-- XỈU -->
+              <div id="xiuCard" class="card p-6 text-center">
+                <h2 class="text-2xl font-bold text-yellow-400 mb-3">XỈU</h2>
+                <div class="flex justify-between mb-3">
+                  <div>
+                    <p class="text-sm text-gray-300">Người chơi</p>
+                    <p class="text-lg font-bold"><span id="xiuPlayers">0</span></p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-300">Tổng điểm</p>
+                    <p class="text-lg font-bold"><span id="xiuScore">0</span></p>
+                  </div>
+                </div>
+                <button id="btnXiu" class="btn w-full py-2" onclick="chooseSide('xiu')">
+                  <i class="fas fa-hand-point-up mr-2"></i> CHỌN XỈU
+                </button>
+              </div>
+            </div>
+            
+            <!-- Betting Controls -->
+            <div class="mt-6">
+              <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+                <button class="btn py-2" onclick="addPoint(1000)">1K</button>
+                <button class="btn py-2" onclick="addPoint(10000)">10K</button>
+                <button class="btn py-2" onclick="addPoint(50000)">50K</button>
+                <button class="btn py-2" onclick="addPoint(100000)">100K</button>
+                <button class="btn py-2" onclick="addPoint(500000)">500K</button>
+                <button class="btn py-2" onclick="addPoint(1000000)">1M</button>
+              </div>
+              
+              <div class="grid grid-cols-3 gap-3">
+                <button class="btn py-2 bg-purple-600 hover:bg-purple-500" onclick="allIn()">
+                  <i class="fas fa-fire mr-2"></i> ALL-IN
+                </button>
+                <button class="btn py-2 bg-green-600 hover:bg-green-500" onclick="confirmBet()">
+                  <i class="fas fa-check-circle mr-2"></i> ĐẶT CƯỢC
+                </button>
+                <button class="btn py-2 bg-red-600 hover:bg-red-500" onclick="cancelBet()">
+                  <i class="fas fa-times-circle mr-2"></i> HỦY
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Game History -->
+          <div class="card p-4">
+            <h3 class="font-bold text-yellow-300 mb-3">
+              <i class="fas fa-history mr-2"></i> Lịch sử chơi
+            </h3>
+            <div id="gameHistory" class="h-32 overflow-y-auto">
+              <p class="text-gray-400 text-center py-4">Chưa có lịch sử chơi</p>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <!-- Trạng thái -->
-      <div class="card p-4">
-        <h3 class="font-bold text-yellow-300">📊 Trạng thái</h3>
-        <p class="mt-2">Điểm của bạn: <span id="myPoints" class="font-bold text-green-400">0</span></p>
-        <p class="mt-1">Cược tạm: <span id="betTemp" class="text-yellow-400">0</span></p>
-        <p class="mt-1">Cửa: <span id="betSide" class="text-red-400">Chưa chọn</span></p>
-        <p class="mt-1">Kết quả: <span id="result" class="text-yellow-400 font-bold">Đang chờ...</span></p>
-      </div>
-
-      <!-- Bảng xếp hạng -->
-      <div class="card p-4">
-        <h3 class="font-bold text-yellow-300 mb-2">🏆 Top 100</h3>
-        <div class="h-40 overflow-y-auto">
-          <table class="w-full text-sm text-left">
-            <thead>
-              <tr class="text-yellow-400">
-                <th class="px-2">#</th>
-                <th class="px-2">Tên</th>
-                <th class="px-2">Điểm</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard"></tbody>
-          </table>
+        
+        <!-- Game Stats -->
+        <div class="game-stats w-full lg:w-96 space-y-6">
+          <!-- Player Stats -->
+          <div class="card p-4">
+            <h3 class="font-bold text-yellow-300 mb-3">
+              <i class="fas fa-user-circle mr-2"></i> Thông tin người chơi
+            </h3>
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-300">Điểm của bạn:</span>
+                <span id="myPoints" class="font-bold text-green-400">0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Cược tạm:</span>
+                <span id="betTemp" class="text-yellow-400">0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Cửa đã chọn:</span>
+                <span id="betSide" class="text-red-400">Chưa chọn</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Kết quả:</span>
+                <span id="result" class="text-yellow-400 font-bold">Đang chờ...</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Tỷ lệ thắng:</span>
+                <span id="winRate" class="text-blue-400">0%</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Leaderboard -->
+          <div class="card p-4">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold text-yellow-300">
+                <i class="fas fa-trophy mr-2"></i> Bảng xếp hạng
+              </h3>
+              <button onclick="updateLeaderboard()" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+            <div class="h-64 overflow-y-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-yellow-400 border-b border-gray-700">
+                    <th class="pb-2 text-left">#</th>
+                    <th class="pb-2 text-left">Tên</th>
+                    <th class="pb-2 text-right">Điểm</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Chat -->
+          <div class="card p-4">
+            <h3 class="font-bold text-yellow-300 mb-3">
+              <i class="fas fa-comments mr-2"></i> Chat Box
+            </h3>
+            <div id="chatBox" class="h-48 overflow-y-auto bg-black/30 rounded p-3 mb-3"></div>
+            <div class="flex">
+              <input id="chatInput" type="text" placeholder="Nhập tin nhắn..." 
+                class="flex-1 p-2 rounded-l bg-gray-800 text-white border border-gray-700 focus:border-yellow-400 focus:outline-none"
+                onkeydown="if(event.key==='Enter') sendChat()">
+              <button class="btn rounded-l-none" onclick="sendChat()">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 px-6 text-center text-gray-500 text-sm">
+    <p>© 2023 Tài Xỉu Vui - Phiên bản nâng cấp</p>
+  </footer>
 
   <script>
+    // Game variables
     let timer = 20, countdown;
     let myPoints = 0, betTemp = 0, betTempSaved = 0, betSide = null, hasChosenSide = false;
     let taiScore = 0, xiuScore = 0, taiPlayers = 0, xiuPlayers = 0;
     let playerName = "";
-
+    let gameHistory = [];
+    let totalGames = 0, wins = 0, losses = 0, draws = 0;
+    
+    // Helper function to safely update DOM elements
+    function safeUpdateElement(id, text) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = text;
+        return true;
+      }
+      console.error(`Element with ID '${id}' not found`);
+      return false;
+    }
+    
     // ================= AUTH ==================
     function register() {
       let user = document.getElementById("usernameInput").value.trim();
       let pass = document.getElementById("passwordInput").value.trim();
-      if (!user || !pass) { alert("Nhập đầy đủ thông tin!"); return; }
-      if (localStorage.getItem("user_" + user)) { alert("Tên đã tồn tại!"); return; }
-      let data = {username: user, password: pass, points: 1000000};
-      localStorage.setItem("user_" + user, JSON.stringify(data));
-      alert("Đăng ký thành công! Bạn có 1,000,000 điểm.");
+      
+      if (!user || !pass) { 
+        showNotification("Vui lòng nhập đầy đủ thông tin!", "error"); 
+        return; 
+      }
+      
+      if (localStorage.getItem("user_" + user)) { 
+        showNotification("Tên tài khoản đã tồn tại!", "error"); 
+        return; 
+      }
+      
+      try {
+        let data = {
+          username: user, 
+          password: pass, 
+          points: 1000000,
+          stats: { totalGames: 0, wins: 0, losses: 0, draws: 0 },
+          history: []
+        };
+        
+        localStorage.setItem("user_" + user, JSON.stringify(data));
+        showNotification("Đăng ký thành công! Bạn nhận được 1,000,000 điểm.", "success");
+      } catch (e) {
+        showNotification("Lỗi khi đăng ký: " + e.message, "error");
+        console.error("Registration error:", e);
+      }
     }
-
+    
     function login() {
       let user = document.getElementById("usernameInput").value.trim();
       let pass = document.getElementById("passwordInput").value.trim();
-      let data = localStorage.getItem("user_" + user);
-      if (!data) { alert("Không tìm thấy tài khoản!"); return; }
-      let obj = JSON.parse(data);
-      if (obj.password !== pass) { alert("Sai mật khẩu!"); return; }
-      playerName = obj.username;
-      myPoints = obj.points;
-      document.getElementById("playerName").textContent = playerName;
-      document.getElementById("myPoints").textContent = myPoints.toLocaleString();
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("gameScreen").classList.remove("hidden");
-      updateLeaderboard();
-      loadChatHistory();
-      startTimer();
+      
+      if (!user || !pass) { 
+        showNotification("Vui lòng nhập đầy đủ thông tin!", "error"); 
+        return; 
+      }
+      
+      try {
+        let dataStr = localStorage.getItem("user_" + user);
+        
+        if (!dataStr) { 
+          showNotification("Không tìm thấy tài khoản!", "error"); 
+          return; 
+        }
+        
+        let obj;
+        try {
+          obj = JSON.parse(dataStr);
+        } catch (e) {
+          showNotification("Lỗi dữ liệu tài khoản!", "error");
+          console.error("JSON parse error:", e);
+          return;
+        }
+        
+        if (obj.password !== pass) { 
+          showNotification("Sai mật khẩu!", "error"); 
+          return; 
+        }
+        
+        // Login successful
+        playerName = obj.username;
+        myPoints = obj.points || 1000000; // Default to 1M if points not set
+        
+        // Load stats if available
+        if (obj.stats) {
+          totalGames = obj.stats.totalGames || 0;
+          wins = obj.stats.wins || 0;
+          losses = obj.stats.losses || 0;
+          draws = obj.stats.draws || 0;
+          updateWinRate();
+        }
+        
+        // Load game history if available
+        if (obj.history) {
+          gameHistory = obj.history || [];
+          updateGameHistory();
+        }
+        
+        // Update UI - using safeUpdateElement to avoid null errors
+        safeUpdateElement("playerName", playerName);
+        safeUpdateElement("playerNameHeader", playerName);
+        safeUpdateElement("myPoints", myPoints.toLocaleString());
+        safeUpdateElement("myPointsHeader", myPoints.toLocaleString());
+        
+        // Show game screen and hide login screen
+        const loginScreen = document.getElementById("loginScreen");
+        const gameScreen = document.getElementById("gameScreen");
+        const userInfo = document.getElementById("userInfo");
+        
+        if (loginScreen) loginScreen.classList.add("hidden");
+        if (gameScreen) gameScreen.classList.remove("hidden");
+        if (userInfo) {
+          userInfo.classList.remove("hidden");
+          userInfo.classList.add("flex");
+        }
+        
+        updateLeaderboard();
+        loadChatHistory();
+        startTimer();
+        
+        showNotification(`Chào mừng ${playerName} quay trở lại!`, "success");
+      } catch (e) {
+        showNotification("Lỗi khi đăng nhập: " + e.message, "error");
+        console.error("Login error:", e);
+      }
     }
-
+    
     function saveData() {
-      let old = JSON.parse(localStorage.getItem("user_" + playerName));
-      let data = {username: playerName, password: old.password, points: myPoints};
-      localStorage.setItem("user_" + playerName, JSON.stringify(data));
+      if (!playerName) return;
+      
+      try {
+        let old = JSON.parse(localStorage.getItem("user_" + playerName) || "{}");
+        let data = {
+          username: playerName, 
+          password: old.password || "", 
+          points: myPoints,
+          stats: { totalGames, wins, losses, draws },
+          history: gameHistory
+        };
+        
+        localStorage.setItem("user_" + playerName, JSON.stringify(data));
+        
+        // Update header points
+        safeUpdateElement("myPointsHeader", myPoints.toLocaleString());
+      } catch (e) {
+        showNotification("Lỗi khi lưu dữ liệu: " + e.message, "error");
+        console.error("Save data error:", e);
+      }
     }
-
+    
     // ================= GAME ==================
     function startTimer() {
       timer = 20;
-      document.getElementById("timer").textContent = timer;
+      safeUpdateElement("timer", timer);
+      
+      const timerContainer = document.getElementById("timerContainer");
+      if (timerContainer) timerContainer.classList.remove("timer-warning");
+      
       countdown = setInterval(() => {
         timer--;
-        document.getElementById("timer").textContent = timer;
-        if (timer <= 0) { clearInterval(countdown); rollDice(); }
+        safeUpdateElement("timer", timer);
+        
+        // Add warning effect when timer is low
+        if (timer <= 5) {
+          if (timerContainer) timerContainer.classList.add("timer-warning");
+        }
+        
+        if (timer <= 0) { 
+          clearInterval(countdown); 
+          rollDice(); 
+        }
       }, 1000);
     }
-
-    function addPoint(val) { betTemp += val; document.getElementById("betTemp").textContent = betTemp.toLocaleString(); }
-    function allIn() { betTemp = myPoints; document.getElementById("betTemp").textContent = betTemp.toLocaleString(); }
+    
+    function addPoint(val) { 
+      betTemp += val; 
+      safeUpdateElement("betTemp", betTemp.toLocaleString()); 
+    }
+    
+    function allIn() { 
+      betTemp = myPoints; 
+      safeUpdateElement("betTemp", betTemp.toLocaleString()); 
+    }
+    
     function chooseSide(side) {
-      if (hasChosenSide) return;
-      betSide = side; hasChosenSide = true;
-      document.getElementById("betSide").textContent = side.toUpperCase();
-      if (side === "tai") { document.getElementById("taiCard").classList.add("chosen"); document.getElementById("btnXiu").disabled = true; }
-      else { document.getElementById("xiuCard").classList.add("chosen"); document.getElementById("btnTai").disabled = true; }
-    }
-
-    function confirmBet() {
-      if (!betSide || betTemp === 0) { alert("Bạn chưa chọn cửa hoặc chưa nhập điểm!"); return; }
-      if (betTemp > myPoints) { alert("Bạn không đủ điểm!"); return; }
-      myPoints -= betTemp; betTempSaved = betTemp;
-      document.getElementById("myPoints").textContent = myPoints.toLocaleString();
-      if (betSide === "tai") { taiScore += betTemp; taiPlayers++; document.getElementById("taiScore").textContent = taiScore.toLocaleString(); document.getElementById("taiPlayers").textContent = taiPlayers; }
-      else { xiuScore += betTemp; xiuPlayers++; document.getElementById("xiuScore").textContent = xiuScore.toLocaleString(); document.getElementById("xiuPlayers").textContent = xiuPlayers; }
-      betTemp = 0; document.getElementById("betTemp").textContent = 0;
-    }
-    function cancelBet() { betTemp = 0; betTempSaved = 0; document.getElementById("betTemp").textContent = 0; }
-
-    function resetRound() {
-      betTemp = 0; betTempSaved = 0; betSide = null; hasChosenSide = false;
-      document.getElementById("betTemp").textContent = 0; document.getElementById("betSide").textContent = "Chưa chọn";
-      document.getElementById("taiCard").classList.remove("chosen"); document.getElementById("xiuCard").classList.remove("chosen");
-      document.getElementById("btnTai").disabled = false; document.getElementById("btnXiu").disabled = false;
-    }
-
-    function rollDice() {
-      let d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1, d3 = Math.floor(Math.random()*6)+1;
-      let total = d1+d2+d3, result = total >= 11 ? "tai" : "xiu";
-      document.getElementById("result").textContent = `🎲 ${d1} + ${d2} + ${d3} = ${total} ➝ ${result.toUpperCase()}`;
-      
-      if (betSide) {
-        if (betSide === result) { myPoints += betTempSaved*2; }
-        else {
-          if (taiScore === xiuScore) { myPoints += betTempSaved; } // trả nếu hòa
-        }
-        document.getElementById("myPoints").textContent = myPoints.toLocaleString();
+      if (hasChosenSide) {
+        showNotification("Bạn đã chọn cửa rồi!", "warning");
+        return;
       }
-
-      saveData(); updateLeaderboard(); resetRound();
-      taiScore=0; xiuScore=0; taiPlayers=0; xiuPlayers=0;
-      document.getElementById("taiScore").textContent=0; document.getElementById("xiuScore").textContent=0;
-      document.getElementById("taiPlayers").textContent=0; document.getElementById("xiuPlayers").textContent=0;
-      startTimer();
+      
+      betSide = side; 
+      hasChosenSide = true;
+      safeUpdateElement("betSide", side.toUpperCase());
+      
+      const taiCard = document.getElementById("taiCard");
+      const xiuCard = document.getElementById("xiuCard");
+      const btnTai = document.getElementById("btnTai");
+      const btnXiu = document.getElementById("btnXiu");
+      
+      if (side === "tai") { 
+        if (taiCard) taiCard.classList.add("chosen"); 
+        if (btnXiu) btnXiu.disabled = true; 
+      }
+      else { 
+        if (xiuCard) xiuCard.classList.add("chosen"); 
+        if (btnTai) btnTai.disabled = true; 
+      }
+      
+      showNotification(`Bạn đã chọn ${side.toUpperCase()}`, "info");
     }
-
+    
+    function confirmBet() {
+      if (!betSide || betTemp === 0) { 
+        showNotification("Bạn chưa chọn cửa hoặc chưa nhập điểm!", "warning"); 
+        return; 
+      }
+      if (betTemp > myPoints) { 
+        showNotification("Bạn không đủ điểm!", "error"); 
+        return; 
+      }
+      
+      myPoints -= betTemp; 
+      betTempSaved = betTemp;
+      safeUpdateElement("myPoints", myPoints.toLocaleString());
+      
+      if (betSide === "tai") { 
+        taiScore += betTemp; 
+        taiPlayers++; 
+        safeUpdateElement("taiScore", taiScore.toLocaleString()); 
+        safeUpdateElement("taiPlayers", taiPlayers); 
+      }
+      else { 
+        xiuScore += betTemp; 
+        xiuPlayers++; 
+        safeUpdateElement("xiuScore", xiuScore.toLocaleString()); 
+        safeUpdateElement("xiuPlayers", xiuPlayers); 
+      }
+      
+      betTemp = 0; 
+      safeUpdateElement("betTemp", 0);
+      
+      showNotification(`Đặt cược ${betTempSaved.toLocaleString()} điểm vào ${betSide.toUpperCase()} thành công!`, "success");
+    }
+    
+    function cancelBet() { 
+      betTemp = 0; 
+      betTempSaved = 0; 
+      safeUpdateElement("betTemp", 0); 
+    }
+    
+    function resetRound() {
+      betTemp = 0; 
+      betTempSaved = 0; 
+      betSide = null; 
+      hasChosenSide = false;
+      safeUpdateElement("betTemp", 0); 
+      safeUpdateElement("betSide", "Chưa chọn");
+      
+      const taiCard = document.getElementById("taiCard");
+      const xiuCard = document.getElementById("xiuCard");
+      const btnTai = document.getElementById("btnTai");
+      const btnXiu = document.getElementById("btnXiu");
+      
+      if (taiCard) taiCard.classList.remove("chosen"); 
+      if (xiuCard) xiuCard.classList.remove("chosen");
+      if (btnTai) btnTai.disabled = false; 
+      if (btnXiu) btnXiu.disabled = false;
+      
+      safeUpdateElement("result", "Đang chờ...");
+    }
+    
+    function rollDice() {
+      // Show rolling animation
+      safeUpdateElement("dice1", "🎲");
+      safeUpdateElement("dice2", "🎲");
+      safeUpdateElement("dice3", "🎲");
+      
+      // Add animation class
+      const dice1 = document.getElementById("dice1");
+      const dice2 = document.getElementById("dice2");
+      const dice3 = document.getElementById("dice3");
+      
+      if (dice1) dice1.classList.add("roll");
+      if (dice2) dice2.classList.add("roll");
+      if (dice3) dice3.classList.add("roll");
+      
+      setTimeout(() => {
+        let d1 = Math.floor(Math.random()*6)+1;
+        let d2 = Math.floor(Math.random()*6)+1;
+        let d3 = Math.floor(Math.random()*6)+1;
+        let total = d1+d2+d3;
+        let result = total >= 11 ? "tai" : "xiu";
+        
+        // Update dice display
+        safeUpdateElement("dice1", d1);
+        safeUpdateElement("dice2", d2);
+        safeUpdateElement("dice3", d3);
+        
+        // Remove animation class
+        if (dice1) dice1.classList.remove("roll");
+        if (dice2) dice2.classList.remove("roll");
+        if (dice3) dice3.classList.remove("roll");
+        
+        // Update result
+        safeUpdateElement("result", `🎲 ${d1} + ${d2} + ${d3} = ${total} ➝ ${result.toUpperCase()}`);
+        
+        // Process bet result
+        let gameResult = { total, result, playerBet: betSide, playerAmount: betTempSaved };
+        
+        if (betSide) {
+          totalGames++;
+          
+          if (betSide === result) { 
+            myPoints += betTempSaved*2; 
+            wins++;
+            gameResult.outcome = "win";
+            showNotification(`Bạn thắng ${betTempSaved.toLocaleString()} điểm!`, "success");
+          }
+          else {
+            if (taiScore === xiuScore) { 
+              myPoints += betTempSaved; 
+              draws++;
+              gameResult.outcome = "draw";
+              showNotification("Hòa, bạn nhận lại điểm cược!", "info");
+            } else {
+              losses++;
+              gameResult.outcome = "lose";
+              showNotification(`Bạn thua ${betTempSaved.toLocaleString()} điểm!`, "error");
+            }
+          }
+          
+          // Add to game history
+          gameHistory.unshift(gameResult);
+          if (gameHistory.length > 10) gameHistory.pop();
+          updateGameHistory();
+          updateWinRate();
+          
+          safeUpdateElement("myPoints", myPoints.toLocaleString());
+        }
+        
+        saveData(); 
+        updateLeaderboard(); 
+        resetRound();
+        
+        // Reset scores for next round
+        taiScore=0; 
+        xiuScore=0; 
+        taiPlayers=0; 
+        xiuPlayers=0;
+        safeUpdateElement("taiScore", 0); 
+        safeUpdateElement("xiuScore", 0);
+        safeUpdateElement("taiPlayers", 0); 
+        safeUpdateElement("xiuPlayers", 0);
+        
+        // Start next round
+        setTimeout(() => startTimer(), 3000);
+      }, 1000);
+    }
+    
+    // ================= GAME HISTORY ==================
+    function updateGameHistory() {
+      const historyContainer = document.getElementById("gameHistory");
+      if (!historyContainer) {
+        console.error("Game history container not found");
+        return;
+      }
+      
+      if (gameHistory.length === 0) {
+        historyContainer.innerHTML = '<p class="text-gray-400 text-center py-4">Chưa có lịch sử chơi</p>';
+        return;
+      }
+      
+      let html = "";
+      gameHistory.forEach(game => {
+        let resultClass = game.outcome === "win" ? "win" : (game.outcome === "lose" ? "lose" : "draw");
+        let resultText = game.outcome === "win" ? "Thắng" : (game.outcome === "lose" ? "Thua" : "Hòa");
+        let resultIcon = game.outcome === "win" ? "fa-check-circle" : (game.outcome === "lose" ? "fa-times-circle" : "fa-minus-circle");
+        
+        html += `
+          <div class="history-item ${resultClass}">
+            <div class="flex justify-between">
+              <span>${game.total} (${game.result}) - ${game.playerBet.toUpperCase()}</span>
+              <span><i class="fas ${resultIcon}"></i> ${resultText}</span>
+            </div>
+            <div class="text-xs text-gray-400">${game.playerAmount.toLocaleString()} điểm</div>
+          </div>
+        `;
+      });
+      
+      historyContainer.innerHTML = html;
+    }
+    
+    // ================= WIN RATE ==================
+    function updateWinRate() {
+      let winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+      safeUpdateElement("winRate", `${winRate}%`);
+    }
+    
     // ================= LEADERBOARD ==================
     function updateLeaderboard() {
+      const leaderboardBody = document.getElementById("leaderboard");
+      if (!leaderboardBody) {
+        console.error("Leaderboard body not found");
+        return;
+      }
+      
       let players = [];
-      for (let i=0;i<localStorage.length;i++) {
+      for (let i=0; i<localStorage.length; i++) {
         let key = localStorage.key(i);
-        if (key.startsWith("user_")) {
-          let obj = JSON.parse(localStorage.getItem(key));
-          players.push({name: obj.username, score: obj.points});
+        if (key && key.startsWith("user_")) {
+          try {
+            let obj = JSON.parse(localStorage.getItem(key));
+            players.push({
+              name: obj.username, 
+              score: obj.points || 0,
+              wins: obj.stats ? obj.stats.wins || 0 : 0,
+              totalGames: obj.stats ? obj.stats.totalGames || 0 : 0
+            });
+          } catch (e) {
+            console.error("Error parsing user data:", e);
+          }
         }
       }
-      players.sort((a,b)=>b.score-a.score);
-      let top = players.slice(0,100);
-      let html="";
-      top.forEach((p,idx)=>{
-        html += `<tr class="${p.name===playerName?'bg-yellow-700/40 font-bold':''}">
-          <td class="px-2">${idx+1}</td><td class="px-2">${p.name}</td><td class="px-2">${p.score.toLocaleString()}</td></tr>`;
+      
+      players.sort((a,b) => b.score - a.score);
+      let top = players.slice(0, 20);
+      
+      let html = "";
+      top.forEach((p, idx) => {
+        let isCurrentUser = p.name === playerName;
+        let winRate = p.totalGames > 0 ? Math.round((p.wins / p.totalGames) * 100) : 0;
+        
+        // Special styling for top 3
+        let rowClass = "leaderboard-row";
+        if (idx === 0) rowClass += " top-player";
+        if (isCurrentUser) rowClass += " bg-yellow-900/20";
+        
+        // Rank icon
+        let rankIcon = "";
+        if (idx === 0) rankIcon = '<i class="fas fa-crown text-yellow-400"></i>';
+        else if (idx === 1) rankIcon = '<i class="fas fa-medal text-gray-300"></i>';
+        else if (idx === 2) rankIcon = '<i class="fas fa-award text-amber-700"></i>';
+        
+        html += `
+          <tr class="${rowClass}">
+            <td class="py-2">${rankIcon} ${idx + 1}</td>
+            <td class="py-2 ${isCurrentUser ? 'font-bold text-yellow-400' : ''}">${p.name}</td>
+            <td class="py-2 text-right">
+              <div>${p.score.toLocaleString()}</div>
+              <div class="text-xs text-gray-400">${winRate}% thắng</div>
+            </td>
+          </tr>
+        `;
       });
-      document.getElementById("leaderboard").innerHTML = html;
+      
+      leaderboardBody.innerHTML = html;
     }
-
+    
     // ================= CHAT ==================
     function loadChatHistory() {
-      let chatBox=document.getElementById("chatBox");
-      chatBox.innerHTML="";
-      let history=JSON.parse(localStorage.getItem("chat_history")||"[]");
-      history.forEach(msg=>{
-        let p=document.createElement("p");
-        p.innerHTML=`<span class="text-green-400">${msg.user}:</span> ${msg.text}`;
-        chatBox.appendChild(p);
-      });
-      chatBox.scrollTop=chatBox.scrollHeight;
+      const chatBox = document.getElementById("chatBox");
+      if (!chatBox) {
+        console.error("Chat box not found");
+        return;
+      }
+      
+      chatBox.innerHTML = "";
+      
+      try {
+        let history = JSON.parse(localStorage.getItem("chat_history") || "[]");
+        history.forEach(msg => {
+          addChatMessage(msg.user, msg.text, msg.time);
+        });
+      } catch (e) {
+        console.error("Error loading chat history:", e);
+      }
+      
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
-
+    
+    function addChatMessage(user, text, time) {
+      const chatBox = document.getElementById("chatBox");
+      if (!chatBox) {
+        console.error("Chat box not found");
+        return;
+      }
+      
+      let messageDiv = document.createElement("div");
+      messageDiv.className = "chat-message";
+      
+      // Format time
+      let timeStr = time ? new Date(time).toLocaleTimeString() : new Date().toLocaleTimeString();
+      
+      // Check if message is from current user
+      let isCurrentUser = user === playerName;
+      
+      messageDiv.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="${isCurrentUser ? 'text-green-400 font-bold' : 'text-yellow-400'}">${user}:</span>
+            <span class="ml-2">${text}</span>
+          </div>
+          <span class="text-xs text-gray-500">${timeStr}</span>
+        </div>
+      `;
+      
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
     function sendChat() {
-      let msg=document.getElementById("chatInput").value.trim();
+      const chatInput = document.getElementById("chatInput");
+      if (!chatInput) {
+        console.error("Chat input not found");
+        return;
+      }
+      
+      let msg = chatInput.value.trim();
       if (!msg) return;
-      let history=JSON.parse(localStorage.getItem("chat_history")||"[]");
-      history.push({user:playerName,text:msg});
-      if (history.length>200) history.shift(); // chỉ giữ 200 tin
-      localStorage.setItem("chat_history",JSON.stringify(history));
-      loadChatHistory();
-      document.getElementById("chatInput").value="";
+      
+      let time = new Date().toISOString();
+      let history = JSON.parse(localStorage.getItem("chat_history") || "[]");
+      history.push({user: playerName, text: msg, time});
+      
+      // Keep only last 100 messages
+      if (history.length > 100) history.shift();
+      
+      try {
+        localStorage.setItem("chat_history", JSON.stringify(history));
+        addChatMessage(playerName, msg, time);
+      } catch (e) {
+        console.error("Error saving chat message:", e);
+      }
+      
+      chatInput.value = "";
     }
+    
+    // ================= NOTIFICATIONS ==================
+    function showNotification(message, type = "info") {
+      // Create notification element
+      const notification = document.createElement("div");
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Remove notification after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = "0";
+        notification.style.transform = "translateX(100%)";
+        setTimeout(() => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }, 3000);
+    }
+    
+    // Auto-refresh leaderboard every 30 seconds
+    setInterval(updateLeaderboard, 30000);
+    
+    // Auto-refresh chat every 10 seconds
+    setInterval(() => {
+      if (playerName) {
+        loadChatHistory();
+      }
+    }, 10000);
   </script>
 </body>
 </html>
